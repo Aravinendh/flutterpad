@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DartPad-like Experiment Runner</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Fira Code', monospace;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: #2d2d2d;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      color: #00bcd4;
+    }
+
+    .menu {
+      position: relative;
+    }
+
+    .menu button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 18px;
+    }
+
+    .menu-list {
+      position: absolute;
+      right: 0;
+      top: 35px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 5px;
+      display: none;
+      flex-direction: column;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .menu-list button {
+      background: none;
+      border: none;
+      color: #fff;
+      text-align: left;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid #333;
+    }
+
+    .menu-list button:hover {
+      background: #555;
+    }
+
+    .editor {
+      flex: 1;
+      display: flex;
+    }
+
+    textarea {
+      flex: 1;
+      background: #1e1e1e;
+      color: #fff;
+      border: none;
+      outline: none;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      padding: 15px;
+      resize: none;
+    }
+
+    footer {
+      background-color: #2d2d2d;
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      color: #aaa;
+      border-top: 1px solid #444;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #00bcd4;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 4px;
+      display: none;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DartPad Experiments</h1>
+    <div class="menu">
+      <button id="menuBtn">⋮</button>
+      <div class="menu-list" id="menuList"></div>
+    </div>
+  </header>
+
+  <div class="editor">
+    <textarea id="codeArea" spellcheck="false" placeholder="Select an experiment from the menu..."></textarea>
+  </div>
+
+  <footer>© 2025 Flutter Experiment Lab</footer>
+
+  <div class="toast" id="toast">Code copied!</div>
+
+  <script>
+    const experiments = {
+      'Installation and Setup of Flutter and Dart SDK with Android Studio': `void main() {\n  print('Flutter and Dart SDK setup successful!');\n}`,
+      'Personalized Diary Application using Flutter and Firebase': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MyApp());\n\nclass MyApp extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp(\n      home: Scaffold(\n        body: Center(child: Text('Personal Diary App')),\n      ),\n    );\n  }\n}`,
+      'E-Commerce Product Showcase using Flutter with State Management': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MyApp());\n\nclass MyApp extends StatefulWidget {\n  @override\n  _MyAppState createState() => _MyAppState();\n}\n\nclass _MyAppState extends State<MyApp> {\n  int count = 0;\n\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp(\n      home: Scaffold(\n        appBar: AppBar(title: Text('E-Commerce Showcase')),\n        body: Column(\n          children: [\n            Text('Products: ' + count.toString()),\n            ElevatedButton(\n              onPressed: () => setState(() => count++),\n              child: Text('Add Product'),\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n}`,
+      'Expense Tracker Application using Flutter and Firebase Firestore': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Expense Tracker App')));`,
+      'Multi-Page Navigation Tourism App': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(\n  initialRoute: '/',\n  routes: {\n    '/': (context) => Home(),\n    '/about': (context) => About(),\n  },\n));\n\nclass Home extends StatelessWidget {\n  Widget build(BuildContext context) {\n    return Scaffold(\n      body: Center(\n        child: ElevatedButton(\n          child: Text('Go to About'),\n          onPressed: () => Navigator.pushNamed(context, '/about'),\n        ),\n      ),\n    );\n  }\n}\n\nclass About extends StatelessWidget {\n  Widget build(BuildContext context) {\n    return Scaffold(\n      body: Center(child: Text('Tourism Info Page')));\n  }\n}`,
+      'To-Do List with Notifications App': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('To-Do List App')));`,
+      'Live Weather Forecast App': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Live Weather Forecast')));`,
+      'Fitness Tracker Application': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Fitness Tracker')));`,
+      'Movie Recommendation Application': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Movie Recommendation App')));`,
+      'Chat Application with Firebase': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Chat App')));`,
+      'Restaurant Ordering System': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Restaurant Ordering App')));`,
+      'News Aggregator App using Flutter and REST API': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('News Aggregator')));`,
+      'Music Player App with Gesture Controls': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Music Player')));`,
+      'Portfolio Website using Flutter Web': `import 'package:flutter/material.dart';\n\nvoid main() => runApp(MaterialApp(home: Text('Portfolio Website')));`,
+      'Full-Scale App Deployment': `void main() {\n  print('App ready for deployment!');\n}`
+    };
+
+    const menuBtn = document.getElementById('menuBtn');
+    const menuList = document.getElementById('menuList');
+    const codeArea = document.getElementById('codeArea');
+    const toast = document.getElementById('toast');
+
+    menuBtn.addEventListener('click', () => {
+      menuList.style.display = menuList.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    for (const [title, code] of Object.entries(experiments)) {
+      const btn = document.createElement('button');
+      btn.textContent = title;
+      btn.onclick = () => {
+        codeArea.value = code;
+        navigator.clipboard.writeText(code);
+        showToast();
+        menuList.style.display = 'none';
+      };
+      menuList.appendChild(btn);
+    }
+
+    function showToast() {
+      toast.style.display = 'block';
+      setTimeout(() => (toast.style.display = 'none'), 1500);
+    }
+  </script>
+</body>
+</html>
